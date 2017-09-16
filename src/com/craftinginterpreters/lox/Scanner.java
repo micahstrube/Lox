@@ -87,6 +87,19 @@ class Scanner {
                     while (peek() != '\n' && !isAtEnd()) {
                         advance();
                     }
+                } else if (match('*')) {
+                    // A block comment goes until */ is found or EOF
+                    while (peek() != '*' && peekNext() != '/' && !isAtEnd()) {
+                        // Still increment line count
+                        if (peek() == '\n') {
+                            line++;
+                        }
+                        advance();
+                    }
+                    if (!isAtEnd()) {
+                        advance(); // STAR
+                        advance(); // SLASH
+                    }
                 } else {
                     addToken(SLASH);
                 }
