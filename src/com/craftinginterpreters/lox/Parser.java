@@ -103,8 +103,8 @@ public class Parser {
 
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
-            consume(RIGHT_PAREN, "Expect ')' after expression.";
-            return new Expr.Grouping(expr)
+            consume(RIGHT_PAREN, "Expect ')' after expression.");
+            return new Expr.Grouping(expr);
         }
 
         throw error(peek(), "Expect expression.");
@@ -121,7 +121,7 @@ public class Parser {
         return false;
     }
 
-    private void consume(TokenType type, String message) {
+    private Token consume(TokenType type, String message) {
         if (check(type)) return advance();
 
         throw error(peek(),message);
@@ -138,6 +138,7 @@ public class Parser {
         if (!isAtEnd()) {
             current++;
         }
+        return previous();
     }
 
     private boolean isAtEnd() {
@@ -162,7 +163,7 @@ public class Parser {
 
         while (!isAtEnd()) {
             if (previous().type == SEMICOLON) {
-                return
+                return;
             }
 
             switch (peek().type) {
