@@ -1,6 +1,7 @@
 package com.craftinginterpreters.lox;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.craftinginterpreters.lox.TokenType.*;
@@ -16,17 +17,60 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-        try {
-            return expression();
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(statement());
         }
-        catch (ParseError error) {
-            return null;
-        }
+
+        return statements;
     }
 
     private Expr expression() {
-        return equality();
+        return comma();
+    }
+
+    private Stmt statement() {
+        if (match(PRINT)) {
+            return printStatement();
+        }
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
+
+    private Expr comma() {
+        Expr expr = equality();
+
+        while (match(COMMA)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr conditional() {
+        Expr expr = equality();
+
+        while (match(QUESTION)) {
+            Token operator = previous();
+
+        }
+
+        return expr;
     }
 
     private Expr equality() {
